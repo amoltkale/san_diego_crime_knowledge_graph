@@ -23,9 +23,14 @@ def remove_puncuations(df, col, *, keep=None):
     
 def add_word_count(df, col):
     new_col = f"{col}_count"
-    df[new_col] = df[col].apply(lambda x: len(x.split(' ')))
+    df[new_col] = df[col].apply(lambda x: len(x.split()))
     return df
-    
+
+def concat_str_cols(df, col_a, col_b, merge_col, *, delimiter = ' '):
+    df[merge_col] = df[col_a] + delimiter + df[col_b]
+    df[merge_col] = df[merge_col].apply(lambda x: ' '.join(x.split()))
+    return df
+
 def clean_str_col(df, col):
     df = translate_emojis(df, col)
     # remove urls and embedded gifs/giphy
