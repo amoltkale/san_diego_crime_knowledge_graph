@@ -6,5 +6,6 @@ venv/*
 __pycache__/*
 test_scripts
 data
+data_cleaning_and_integration/.ipynb_checkpoints
 models/.ipynb_checkpoints/*
 data_cleaning_and_integration/__pycache__/*
