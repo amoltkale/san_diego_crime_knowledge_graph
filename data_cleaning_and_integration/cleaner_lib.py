@@ -7,7 +7,7 @@ from datetime import datetime
 
 def translate_emojis(df, col):
     # source: https://stackoverflow.com/a/69423881
-    df[col] =  df[col].apply(lambda x: ''.join((' '+c+' ') if c in emoji.UNICODE_EMOJI['en'] else c for c in x))
+    df[col] =  df[col].apply(lambda x: ''.join((' '+c+' ') if c in emoji.UNICODE_EMOJI['en'] else c for c in str(x)))
     df[col] =  df[col].apply(lambda x: emoji.demojize(x))
     return df
 
