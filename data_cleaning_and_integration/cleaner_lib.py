@@ -3,6 +3,7 @@ import string
 import pandas as pd
 
 import emoji
+from datetime import datetime
 
 def translate_emojis(df, col):
     # source: https://stackoverflow.com/a/69423881
@@ -41,4 +42,34 @@ def clean_str_col(df, col):
     
     df = remove_puncuations(df, col, keep=['.', ' '])
     df[col] = df[col].str.lower()
+    return df
+
+
+def bin_the_date(x):
+    ''' This function returns binned time of the day given the hour of the day.'''
+    if (x > 4) and (x <= 8):
+        return 'Early Morning'
+    elif (x > 8) and (x <= 12 ):
+        return 'Morning'
+    elif (x > 12) and (x <= 16):
+        return'Noon'
+    elif (x > 16) and (x <= 20) :
+        return 'Evening'
+    elif (x > 20) and (x <= 24):
+        return'Night'
+    elif (x <= 4):
+        return'Late Night'
+
+
+
+def get_binned_tod(date):
+    ''' This function returns hour of the day given the timestamp.'''
+    d = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+    return bin_the_date(d.hour)
+
+
+def get_binned_tod_col(df, col):
+    ''' This function returns pd dataframe with the binned time of the data.'''
+    new_col = f"{col}_bin"
+    df[new_col] = df[col].apply(lambda x: get_binned_tod(x))
     return df
