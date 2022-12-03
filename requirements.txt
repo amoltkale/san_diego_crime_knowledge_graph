@@ -6,3 +6,4 @@ emoji==1.7
 nltk==3.7
 rake-nltk==1.0.6
 py-stringmatching==0.4.2
+scikit-learn==1.1.3
