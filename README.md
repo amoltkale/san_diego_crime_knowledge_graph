@@ -1,9 +1,14 @@
 # dse203_project
-
+python versions known to work: 3.8.13, 3.10.8
 ## Install
 1. Clone repository
-2. Set up python virtual environment (currently running 3.10.8)
-    * `python3 -m venv venv`
+2. Set up python virtual environment called `venv`
+    * unix: `python3 -m venv venv`
+    * windows: `python -m venv venv`
+3. Activate virtual environment
+    * windows: `source venv/Scripts/activate`
+    * unix fish activate: `. venv/bin/activate.fish`
+    * unix: `. venv/bin/activate`
 3. Install necessary dependencies
     * `pip install -r requirements.txt`
 
