@@ -1,5 +1,5 @@
 # dse203_project
-python versions known to work: 3.8.13, 3.10.8
+python versions known to work: 3.8.9, 3.8.13
 ## Install
 1. Clone repository
 2. Set up python virtual environment called `venv`
@@ -9,7 +9,7 @@ python versions known to work: 3.8.13, 3.10.8
     * windows: `source venv/Scripts/activate`
     * unix fish activate: `. venv/bin/activate.fish`
     * unix: `. venv/bin/activate`
-3. Install necessary dependencies
+4. Install necessary dependencies
     * `pip install -r requirements.txt`
 
 ## Scrapping Reddit
