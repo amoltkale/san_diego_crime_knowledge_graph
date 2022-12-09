@@ -37,22 +37,22 @@ return distinct org as store, count_posts as crimes_posted
 
 ### 4. Ranking according to post counts and print top ethnicities. [Bias between two social media platforms]
 ```sql
-CALL {match (p:REDDIT_POST)-[:ETHNICITY_MENTIONED]->(e)
+CALL {match (p:REDDIT_POST)-[:ETHNICITY_MENTIONED]->(e), (p)-[:BELONGS_TO]->(c)
 with e.ethnicity as eth, count(distinct p.post_id) as count_posts
 ORDER BY count_posts DESC
 WITH COLLECT(eth) as rs
 UNWIND range(1,size(rs)) as rank
-RETURN (rs[rank-1]+'_reddit') as r, rank limit 5
+RETURN  'reddit' as media, rs[rank-1] as r, rank limit 10
 UNION
-match (p:NEXTDOOR_POST)-[:ETHNICITY_MENTIONED]->(e)
+match (p:NEXTDOOR_POST)-[:ETHNICITY_MENTIONED]->(e), (p)-[:BELONGS_TO]->(c)
 with e.ethnicity as eth, count(distinct p.post_id) as count_posts
 ORDER BY count_posts DESC
 WITH COLLECT(eth) as rs
 UNWIND range(1,size(rs)) as rank
-RETURN  (rs[rank-1]+'_nextdoor') as r, rank limit 5}
-WITH r, rank
-order by rank
-return r as ethnicity_media,rank
+RETURN 'nextdoor' as media, rs[rank-1] as r,  rank limit 10}
+WITH media, r as ethnicity, rank 
+order by rank, media
+return rank, media, ethnicity
 ```
 
 
