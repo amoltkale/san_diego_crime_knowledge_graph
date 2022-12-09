@@ -106,8 +106,8 @@ RETURN communityId, size, crimes limit 10
 ```sql
 CALL gds.degree.stream('crime_graph')
 YIELD nodeId, score
-RETURN  score AS followers ,  gds.util.asNode(nodeId).crime_set AS name
-ORDER BY followers DESC limit 10
+RETURN  score ,  gds.util.asNode(nodeId).crime_set AS crime_bucket
+ORDER BY score DESC limit 10
 ```
 
 ## Drop an in-memory graph
