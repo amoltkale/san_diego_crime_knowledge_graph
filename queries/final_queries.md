@@ -7,7 +7,7 @@ UNWIND top_t as t_i
 MATCH (report)-[:BELONGS_TO]->(c),(report)-[:HAPPENED_AT]->(t:TIME_OF_DAY {time_of_day_id:t_i})
 WITH c, t, count(t_i) as t_count
 ORDER BY t_count DESC
-RETURN t.date_time_bin, collect(c.crime_set)[..3] as crime
+RETURN t.date_time_bin as time_of_day, collect(c.crime_set)[..3] as top_3_crimes
 ```
 
 ### 2.  Top Crime commited in Top 5 neighborhoods with crime related posts - Modify
@@ -32,7 +32,7 @@ MATCH (p)-[:BELONGS_TO]->(c)
 where p.ORG =~ (".*" + x + ".*") 
 WITH x as org, count(distinct p.post_id) as count_posts
 order by count_posts DESC
-return distinct org, count_posts
+return distinct org as store, count_posts as crimes_posted
 ```
 
 
@@ -54,7 +54,7 @@ UNWIND range(1,size(rs)) as rank
 RETURN  (rs[rank-1]+'_nextdoor') as r, rank limit 5}
 WITH r, rank
 order by rank
-return r,rank
+return r as ethnicity_media,rank
 ```
 
 
@@ -85,7 +85,7 @@ CALL gds.pageRank.stream('crime_graph', {
   relationshipWeightProperty: 'weight'
 })
 YIELD nodeId, score
-RETURN gds.util.asNode(nodeId).crime_set_id AS id, gds.util.asNode(nodeId).crime_set as name, score as full_pagerank
+RETURN gds.util.asNode(nodeId).crime_set_id AS crime_id, gds.util.asNode(nodeId).crime_set as crime_bucket, score as full_pagerank
 ORDER BY full_pagerank DESC limit 10
 ```
 
@@ -94,11 +94,12 @@ ORDER BY full_pagerank DESC limit 10
 ```sql
 CALL gds.louvain.stream('crime_graph')
 YIELD nodeId, communityId, intermediateCommunityIds
-RETURN gds.util.asNode(nodeId).crime_set AS crime_name, communityId
-ORDER BY crime_name ASC limit 15
+WITH gds.util.asNode(nodeId).crime_set AS crime_bucket, communityId
+//ORDER BY crime_bucket limit 15
+with communityId, size(collect(crime_bucket)) AS size, collect(crime_bucket) as crimes
+WHERE  size > 1 and  size <15
+RETURN communityId, size, crimes limit 10
 ```
-##### --Grouping by communityID
-
 
 ## 3. Degree Centrality for crime node
 ##### The Degree Centrality algorithm can be used to find popular nodes within a graph. Degree centrality measures the number of incoming or outgoing (or both) relationships from a node, depending on the orientation of a relationship projection.
