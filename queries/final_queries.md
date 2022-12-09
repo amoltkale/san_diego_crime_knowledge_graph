@@ -10,7 +10,7 @@ ORDER BY t_count DESC
 RETURN t.date_time_bin as time_of_day, collect(c.crime_set)[..3] as top_3_crimes
 ```
 
-### 2.  Top Crime commited in Top 5 neighborhoods with crime related posts - Modify
+### 2.  Top 3 crimes per neighborhood [Top 5 neighborhood with crime related posts]
 ```sql
 CALL {match (report)-[:BELONGS_TO]->(c),(report)-[:HAPPENED_IN]->(n)
 WITH n,size(collect(DISTINCT c.crime_set)) as count_of_crimes
@@ -19,9 +19,8 @@ UNWIND top_n as n_i
 MATCH (report)-[:BELONGS_TO]->(c),(report)-[:HAPPENED_IN]->(n:neighborhood {neighborhood_set_id:n_i})
 WITH c, n, count(n_i) as n_count
 ORDER BY n_count DESC
-RETURN n_count, n.neighborhood_set as neighbourhood,c.crime_set as crime
+RETURN n.neighborhood_set as neighbourhood,collect(c.crime_set)[..3] as top_3_crimes
 ```
-
 
 
 ### 3. Distribution of crime posts related to few local stores [ORG label from NER]
@@ -34,7 +33,6 @@ WITH x as org, count(distinct p.post_id) as count_posts
 order by count_posts DESC
 return distinct org as store, count_posts as crimes_posted
 ```
-
 
 
 ### 4. Ranking according to post counts and print top ethnicities. [Bias between two social media platforms]
@@ -76,7 +74,7 @@ CALL gds.graph.project.cypher('crime_graph',
 return distinct id(c1) as source, id(c2) as target, cntn as weight')
 ```
 
-## 1. Page Rank
+## 6.1. Page Rank
 ##### The PageRank algorithm measures the importance of each node within the graph, based on the number incoming relationships and the importance of the corresponding source nodes. The underlying assumption roughly speaking is that a page is only as important as the pages that link to it.
 ```SQL
 CALL gds.pageRank.stream('crime_graph', {
@@ -89,19 +87,18 @@ RETURN gds.util.asNode(nodeId).crime_set_id AS crime_id, gds.util.asNode(nodeId)
 ORDER BY full_pagerank DESC limit 10
 ```
 
-## 2. Community detection for crimes
+## 6.2. Community detection for crimes
 ##### The Louvain method is an algorithm to detect communities in large networks. It maximizes a modularity score for each community, where the modularity quantifies the quality of an assignment of nodes to communities. This means evaluating how much more densely connected the nodes within a community are, compared to how connected they would be in a random network.
 ```sql
 CALL gds.louvain.stream('crime_graph')
 YIELD nodeId, communityId, intermediateCommunityIds
 WITH gds.util.asNode(nodeId).crime_set AS crime_bucket, communityId
-//ORDER BY crime_bucket limit 15
 with communityId, size(collect(crime_bucket)) AS size, collect(crime_bucket) as crimes
 WHERE  size > 1 and  size <15
 RETURN communityId, size, crimes limit 10
 ```
 
-## 3. Degree Centrality for crime node
+## 6.3. Degree Centrality for crime node
 ##### The Degree Centrality algorithm can be used to find popular nodes within a graph. Degree centrality measures the number of incoming or outgoing (or both) relationships from a node, depending on the orientation of a relationship projection.
 ```sql
 CALL gds.degree.stream('crime_graph')
@@ -110,7 +107,7 @@ RETURN  score ,  gds.util.asNode(nodeId).crime_set AS crime_bucket
 ORDER BY score DESC limit 10
 ```
 
-## Drop an in-memory graph
+## 6.4. Drop an in-memory graph
 ```sql
 CALL gds.graph.drop('crime_graph')
 ```
@@ -119,7 +116,35 @@ CALL gds.graph.drop('crime_graph')
 
 
 
-######
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# supplemental 
 
 ### Total posts grouped by neighborhood - S
 ```sql
