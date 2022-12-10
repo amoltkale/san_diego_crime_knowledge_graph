@@ -9,6 +9,14 @@ WITH c, t, count(t_i) as t_count
 ORDER BY t_count DESC
 RETURN t.date_time_bin as time_of_day, collect(c.crime_set)[..3] as top_3_crimes
 ```
+#### alternative
+```sql
+MATCH (report)-[:BELONGS_TO]->(c),(report)-[:HAPPENED_AT]->(t:TIME_OF_DAY)
+WITH c,t, count(t.time_of_day_id) as t_count
+ORDER BY t_count DESC
+RETURN t.date_time_bin as time_of_day, collect(c.crime_set)[..3] as top_3_crimes
+```
+
 
 ### 2.  Top 3 crimes per neighborhood [Top 5 neighborhood with crime related posts]
 ```sql
@@ -93,19 +101,30 @@ ORDER BY full_pagerank DESC limit 10
 
 ## 6.2. Community detection for crimes
 ##### The Louvain method is an algorithm to detect communities in large networks. It maximizes a modularity score for each community, where the modularity quantifies the quality of an assignment of nodes to communities. This means evaluating how much more densely connected the nodes within a community are, compared to how connected they would be in a random network.
+### 6.2.1
 ```sql
-CALL gds.louvain.stream('crime_graph')
+CALL gds.louvain.stream('crime_graph',
+    {includeIntermediateCommunities: true,relationshipWeightProperty:'weight'}
+)
+YIELD nodeId, communityId, intermediateCommunityIds
+WITH gds.util.asNode(nodeId).crime_set AS crime_bucket, communityId, intermediateCommunityIds
+RETURN communityId, crime_bucket,  intermediateCommunityIds limit 10
+```
+### 6.2.2
+```sql
+CALL gds.louvain.stream('crime_graph',{relationshipWeightProperty:'weight'})
 YIELD nodeId, communityId, intermediateCommunityIds
 WITH gds.util.asNode(nodeId).crime_set AS crime_bucket, communityId
 with communityId, size(collect(crime_bucket)) AS size, collect(crime_bucket) as crimes
-WHERE  size > 1 and  size <15
-RETURN communityId, size, crimes limit 10
+ORDER by size desc
+WHERE  size <50
+RETURN communityId, size, crimes limit 5
 ```
 
 ## 6.3. Degree Centrality for crime node
 ##### The Degree Centrality algorithm can be used to find popular nodes within a graph. Degree centrality measures the number of incoming or outgoing (or both) relationships from a node, depending on the orientation of a relationship projection.
 ```sql
-CALL gds.degree.stream('crime_graph')
+CALL gds.degree.stream('crime_graph',{relationshipWeightProperty:'weight'})
 YIELD nodeId, score
 RETURN  score ,  gds.util.asNode(nodeId).crime_set AS crime_bucket
 ORDER BY score DESC limit 10
