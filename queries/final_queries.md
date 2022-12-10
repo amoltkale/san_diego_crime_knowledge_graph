@@ -42,15 +42,19 @@ with e.ethnicity as eth, count(distinct p.post_id) as count_posts
 ORDER BY count_posts DESC
 WITH COLLECT(eth) as rs
 UNWIND range(1,size(rs)) as rank
-RETURN  'reddit' as media, rs[rank-1] as r, rank limit 10
+WITH 'reddit' as media, rs[rank-1] as ethnicity, rank
+where ethnicity <> 'american' and ethnicity <> 'america'
+RETURN  media, ethnicity, rank limit 10
 UNION
 match (p:NEXTDOOR_POST)-[:ETHNICITY_MENTIONED]->(e), (p)-[:BELONGS_TO]->(c)
 with e.ethnicity as eth, count(distinct p.post_id) as count_posts
 ORDER BY count_posts DESC
 WITH COLLECT(eth) as rs
 UNWIND range(1,size(rs)) as rank
-RETURN 'nextdoor' as media, rs[rank-1] as r,  rank limit 10}
-WITH media, r as ethnicity, rank 
+WITH 'nextdoor' as media, rs[rank-1] as ethnicity, rank
+where ethnicity <> 'american' and ethnicity <> 'america'
+RETURN  media, ethnicity, rank limit 10}
+WITH media, ethnicity, rank
 order by rank, media
 return rank, media, ethnicity
 ```
