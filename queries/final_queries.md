@@ -48,19 +48,19 @@ return distinct org as store, count_posts as crimes_posted
 CALL {match (p:REDDIT_POST)-[:ETHNICITY_MENTIONED]->(e), (p)-[:BELONGS_TO]->(c)
 with e.ethnicity as eth, count(distinct p.post_id) as count_posts
 ORDER BY count_posts DESC
+where eth <> 'american' and eth <> 'america'
 WITH COLLECT(eth) as rs
 UNWIND range(1,size(rs)) as rank
 WITH 'reddit' as media, rs[rank-1] as ethnicity, rank
-where ethnicity <> 'american' and ethnicity <> 'america'
 RETURN  media, ethnicity, rank limit 10
 UNION
 match (p:NEXTDOOR_POST)-[:ETHNICITY_MENTIONED]->(e), (p)-[:BELONGS_TO]->(c)
 with e.ethnicity as eth, count(distinct p.post_id) as count_posts
 ORDER BY count_posts DESC
+where eth <> 'american' and eth <> 'america'
 WITH COLLECT(eth) as rs
 UNWIND range(1,size(rs)) as rank
 WITH 'nextdoor' as media, rs[rank-1] as ethnicity, rank
-where ethnicity <> 'american' and ethnicity <> 'america'
 RETURN  media, ethnicity, rank limit 10}
 WITH media, ethnicity, rank
 order by rank, media
