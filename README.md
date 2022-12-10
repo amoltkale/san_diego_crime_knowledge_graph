@@ -20,15 +20,30 @@ python versions known to work: 3.8.9, 3.8.13
     * `python -m spacy download en_core_web_md`
     * This is used to do NER
 
-## Scrapping Reddit
-1. Get necessary details from reddit account to connect with reddit. [See here for more details](https://towardsdatascience.com/how-to-use-the-reddit-api-in-python-5e05ddfd1e5c)
-    * personal use script
-    * secret
-    * reddit username
-    * reddit password
-2. Run `create_config.py` to create config file
-    * `python create_config.py --personal_use_script <INSERT> --secret <INSERT> --username <INSERT> --password <INSERT>`
-        * Replace `<INSERT>` with text. For example, username could be aaaaa
-        * Do not worry about escape chars, the script handles that
-3. Launch Jupyter
-4. Run all cells to verify everything is working
+## Neo4j Set Up
+1. Install Neo4j Desktop
+2. Create a new project
+3. Navigate to project and spin up an instance
+4. Create a graph database instance
+5. Navigate to `...` on the graph dbms and open up the folder option
+6. Navigate to the `import` directory in the graph dbms file system and copy and paste the `nodes` and `relationships` directory into `import`
+7. Run the following command to upload the data into your graph dbms instance
+
+```bash
+./bin/neo4j-admin import --force --multiline-fields=true --nodes=import/nodes/crime_nodes.csv \
+--nodes=import/nodes/nd_post_nodes.csv \
+--nodes=import/nodes/neighborhood_nodes.csv \
+--nodes=import/nodes/pd_crime_nodes.csv \
+--nodes=import/nodes/reddit_post_nodes.csv \
+--nodes=import/nodes/time_of_day_nodes.csv \
+--nodes=import/nodes/ethnicity_nodes.csv \
+--relationships=import/relationships/police_HI_rels.csv \
+--relationships=import/relationships/reddit_HI_rels.csv \
+--relationships=import/relationships/nextdoor_HI_rels.csv \
+--relationships=import/relationships/reddit_BT_crime_rel.csv \
+--relationships=import/relationships/nextdoor_BT_crime_rel.csv \
+--relationships=import/relationships/police_BT_crime_rel.csv \
+--relationships=import/relationships/police_HA_rels.csv \
+--relationships=import/relationships/reddit_EM_rels.csv \
+--relationships=import/relationships/nextdoor_EM_rels.csv
+```
