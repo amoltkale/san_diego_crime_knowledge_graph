@@ -1,4 +1,23 @@
-### 1. Time of day - Top 3 crimes
+### 0. Priority of calls made to the San Diego Police.
+```sql
+MATCH (p:REPORTED_CRIME) 
+WITH 
+CASE p.priority 
+    WHEN '0'    THEN 'Dispatch immediately. Involves an imminent threat to life.'
+    WHEN '1'   THEN 'Dispatch immediately. Involves serious crimes in progress or a threat to life.' 
+    WHEN '2' THEN 'Dispatch as quickly as possible. Involves complaints regarding less serious crimes in which there is no threat to life.' 
+    WHEN '3' THEN 'Dispatch as quickly as possible. Involves minor crimes or requests for service which are not urgent.'
+    WHEN '4' THEN 'Dispatch when no higher priority calls are waiting. Involves minor requests for police service.'    
+    ELSE 'Not Listed'    
+END AS description,
+p.priority as priority,count(distinct p.incident_num) as report_cnt
+order by report_cnt DESC
+RETURN priority,report_cnt,description
+```
+##### Source: https://www.sandiegouniontribune.com/news/public-safety/story/2022-07-17/san-diego-police-response-times-worst-theyve-been-in-more-than-a-decade
+
+
+### 1. Find top 3 crimes committed for a particular time of day.
 ```sql
 CALL {match (report)-[:BELONGS_TO]->(c),(report)-[:HAPPENED_AT]->(t)
 WITH t, size(collect(DISTINCT c.crime_set)) as count_of_crimes
@@ -18,7 +37,7 @@ RETURN t.date_time_bin as time_of_day, collect(c.crime_set)[..3] as top_3_crimes
 ```
 
 
-### 2.  Top 3 crimes per neighborhood [Top 5 neighborhood with crime related posts]
+### 2. Top 3 crimes per neighborhood for [ top 5 neighborhoods with high number of crime numbers]
 ```sql
 CALL {match (report)-[:BELONGS_TO]->(c),(report)-[:HAPPENED_IN]->(n)
 WITH n,size(collect(DISTINCT c.crime_set)) as count_of_crimes
@@ -31,7 +50,8 @@ RETURN n.neighborhood_set as neighbourhood,collect(c.crime_set)[..3] as top_3_cr
 ```
 
 
-### 3. Distribution of crime posts related to few local stores [ORG label from NER]
+### 3. Distribution of crime related posts mentioning a few local stores [These are basically ORG label from NER]
+
 ```sql
 WITH ['walmart','ikea','walgreens','costco','vons','ralphs','target','gamestop','arco','chevron'] AS org
 UNWIND org as x
