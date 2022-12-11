@@ -48,3 +48,8 @@ python versions known to work: 3.8.9, 3.8.13
 --relationships=import/relationships/reddit_EM_rels.csv \
 --relationships=import/relationships/nextdoor_EM_rels.csv
 ```
+
+
+## Crime Knowledge Graph Queries
+Queries for graph analysis are placed at `queries/final_queries.md` path relative to project directory.
+
