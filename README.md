@@ -19,6 +19,10 @@ python versions known to work: 3.8.9, 3.8.13
 * Spacy's en_core_web_sm
     * `python -m spacy download en_core_web_md`
     * This is used to do NER
+    
+## Data For The pipeline
+1. Extract the `data.zip` file and place the `data` folder at the root of project.
+2. All the python nodebooks and python scripts would run with relative path inside this `data` folder.
 
 ## Neo4j Set Up
 1. Install Neo4j Desktop
