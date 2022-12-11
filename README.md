@@ -26,8 +26,9 @@ python versions known to work: 3.8.9, 3.8.13
 3. Navigate to project and spin up an instance
 4. Create a graph database instance
 5. Navigate to `...` on the graph dbms and open up the folder option
-6. Navigate to the `import` directory in the graph dbms file system and copy and paste the `nodes` and `relationships` directory into `import`
-7. Run the following command to upload the data into your graph dbms instance
+6. Extract `nodes` and `relatiohships` from `graph_files.zip` folder delivered separately.
+7. Navigate to the `import` directory in the graph dbms file system and copy and paste the `nodes` and `relationships` directory into `import`
+8. Run the following command to upload the data into your graph dbms instance
 
 ```bash
 ./bin/neo4j-admin import --force --multiline-fields=true --nodes=import/nodes/crime_nodes.csv \
