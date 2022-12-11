@@ -6,3 +6,4 @@ venv/*
 **/__pycache__/*
 test_scripts
 data/*
+**/.DS_Store
