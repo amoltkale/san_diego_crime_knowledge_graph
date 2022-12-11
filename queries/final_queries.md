@@ -19,17 +19,6 @@ RETURN priority,report_cnt,description
 
 ### 1. Find top 3 crimes committed for a particular time of day.
 ```sql
-CALL {match (report)-[:BELONGS_TO]->(c),(report)-[:HAPPENED_AT]->(t)
-WITH t, size(collect(DISTINCT c.crime_set)) as count_of_crimes
-order by count_of_crimes DESC RETURN distinct t.time_of_day_id AS top_t }
-UNWIND top_t as t_i
-MATCH (report)-[:BELONGS_TO]->(c),(report)-[:HAPPENED_AT]->(t:TIME_OF_DAY {time_of_day_id:t_i})
-WITH c, t, count(t_i) as t_count
-ORDER BY t_count DESC
-RETURN t.date_time_bin as time_of_day, collect(c.crime_set)[..3] as top_3_crimes
-```
-#### alternative
-```sql
 MATCH (report)-[:BELONGS_TO]->(c),(report)-[:HAPPENED_AT]->(t:TIME_OF_DAY)
 WITH c,t, count(t.time_of_day_id) as t_count
 ORDER BY t_count DESC
@@ -51,7 +40,6 @@ RETURN n.neighborhood_set as neighbourhood,collect(c.crime_set)[..3] as top_3_cr
 
 
 ### 3. Distribution of crime related posts mentioning a few local stores [These are basically ORG label from NER]
-
 ```sql
 WITH ['walmart','ikea','walgreens','costco','vons','ralphs','target','gamestop','arco','chevron'] AS org
 UNWIND org as x
@@ -63,7 +51,7 @@ return distinct org as store, count_posts as crimes_posted
 ```
 
 
-### 4. Ranking according to post counts and print top ethnicities. [Bias between two social media platforms]
+### 4. Ranking of ethnicities according to post counts for REDDIT and NEXTDOOR. [Bias between two social media platforms]
 ```sql
 CALL {match (p:REDDIT_POST)-[:ETHNICITY_MENTIONED]->(e), (p)-[:BELONGS_TO]->(c)
 with e.ethnicity as eth, count(distinct p.post_id) as count_posts
@@ -89,7 +77,7 @@ return rank, media, ethnicity
 
 
 # GDS
-## 5. Crime linked to crime using shared nodes
+## 5. Crime to other crime relationship (computed from shared nodes).
 ```SQL
 MATCH (c1:crime)--(n)--(c2:crime)
 WITH n,c1,c2
